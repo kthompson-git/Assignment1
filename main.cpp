@@ -2,6 +2,7 @@
 #include <iostream>
 #include <unistd.h>
 #include <stdio.h>
+#include <sys/wait.h>
 
 
 // check if character in string is duplicated
@@ -142,8 +143,12 @@ void compression(std::string &fileIn, std::vector<char> &sym)
   for (int i = 0; i < sym.size(); i++)
   {
     fileName = "out" + std::to_string(i);
-    // pid = fork();
-    writeToFile(sym[i], fileIn, fileName);
+    if ((pid = fork()) == 0)
+    {
+      writeToFile(sym[i], fileIn, fileName);      
+      exit(0);
+    }
+    wait(0);
     removeChar(sym[i], fileIn);
   }
 }
