@@ -158,7 +158,7 @@ void printVectors(std::vector<char> &sym, std::vector<int> &cnt)
 {
   for (int i = 0; i < sym.size(); i++)
   {
-    if (sym[i] == '\n')
+    if (sym[i] == '\n') // special case for newline character
       std::cout << "<EOL> frequency = " << cnt[i] << std::endl;
     else
       std::cout << sym[i] << " frequency = " << cnt[i] << std::endl;
@@ -175,8 +175,8 @@ void printFiles(std::vector<char> &sym)
   {
     fileName = "out" + std::to_string(i);
     inFile.open(fileName);
-    std::getline(inFile, message);
-    std::getline(inFile, code);
+    std::getline(inFile, message);  // store first line in file as the message
+    std::getline(inFile, code);     // store second line in file as the code
     if (i == 0)
       std::cout << "Original Message:\t" << message << std::endl;
     else
