@@ -35,7 +35,6 @@ int frequency(char symbol, std::string &fileIn)
 // checks character occurences in a string and populates vectors
 void getStringData(std::string &fileIn, std::vector<char> &sym, std::vector<int> &cnt)
 {  
-  std::cout << "\nfileIn: " << fileIn << std::endl;
   for (int i = 0; i < fileIn.length(); i++)
   {
     if (!duplicate(i, fileIn))
@@ -86,28 +85,20 @@ void sortVectors(std::vector<char> &sym, std::vector<int> &cnt)
   return;
 }
 
-// prints the vectors
-void printVectors(std::vector<char> &sym, std::vector<int> &cnt)
-{
-  for (int i = 0; i < sym.size(); i++)
-  {
-    std::cout << sym[i] << " = " << cnt[i] << std::endl;
-  }
-  return;
-}
-
 // child process function to write compression to file
-void writeToFile(char sym, std::string fileIn)
+void writeToFile(char sym, std::string fileIn, std::string fileName)
 {
-  std::cout << fileIn << std::endl;
+  std::ofstream outFile;
+  outFile.open(fileName);
+  outFile << fileIn << std::endl;
   for (int i = 0; i < fileIn.length(); i++)
   {
     if (fileIn[i] == sym)
-      std::cout << 1;
+      outFile << 1;
     else
-      std::cout << 0;
+      outFile << 0;
   }
-  std::cout << std::endl;
+  outFile.close();
   return;
 }
 
@@ -134,11 +125,49 @@ void compression(std::string &fileIn, std::vector<char> &sym)
   for (int i = 0; i < sym.size(); i++)
   {
     fileName = "out" + std::to_string(i);
-    std::cout << fileName << std::endl;
     // pid = fork();
-    writeToFile(sym[i], fileIn);
+    writeToFile(sym[i], fileIn, fileName);
     removeChar(sym[i], fileIn);
   }
+}
+
+// prints the vectors
+void printVectors(std::vector<char> &sym, std::vector<int> &cnt)
+{
+  for (int i = 0; i < sym.size(); i++)
+  {
+    std::cout << sym[i] << " frequency = " << cnt[i] << std::endl;
+  }
+  return;
+}
+
+// prints file(s) contents
+void printFiles(std::vector<char> &sym)
+{
+  std::ifstream inFile;
+  std::string fileName, message, code;
+  for (int i = 0; i < sym.size(); i++)
+  {
+    fileName = "out" + std::to_string(i);
+    inFile.open(fileName);
+    std::getline(inFile, message);
+    std::getline(inFile, code);
+    if (i == 0)
+      std::cout << "Original message:\t" << message << std::endl;
+    else
+      std::cout << "Remaining message:\t" << message << std::endl;
+    std::cout << "Symbol " << sym[i] << " code:\t\t" << code << std::endl;
+    inFile.close();
+  }
+  return;
+}
+
+// calls printing functions
+void printCompression(std::vector<char> &sym, std::vector<int> &cnt)
+{
+  printVectors(sym, cnt);
+  printFiles(sym);
+  return;
 }
 
 int main() 
@@ -153,13 +182,15 @@ int main()
 
   // populate vectors
   getStringData(fileIn, symbol, count);
-  printVectors(symbol, count);
-  std::cout << std::endl;
+
+  // sort vectors
   sortVectors(symbol, count);
-  printVectors(symbol, count);
-  std::cout << std::endl;
+
+  // perform symbol compression
   compression(fileIn, symbol);
 
+  // print compression steps
+  printCompression(symbol, count);
 
   return 0;
 }
