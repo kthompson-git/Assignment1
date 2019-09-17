@@ -8,13 +8,13 @@
 // check if character in string is duplicated
 bool duplicate(int index, std::string &fileIn)
 {
-  if (index == 0)
-    return false;
+  if (index == 0) // check if beginning of string
+    return false; // duplicate not possible
   else
   {
-    for (int i = 0; i < index; i++)
+    for (int i = 0; i < index; i++) // only checks up to current index
     {
-      if (fileIn[index] == fileIn[i])
+      if (fileIn[index] == fileIn[i]) // if any characters match current index return true
         return true;
     }
     return false;
@@ -38,10 +38,10 @@ void getStringData(std::string &fileIn, std::vector<char> &sym, std::vector<int>
 {  
   for (int i = 0; i < fileIn.length(); i++)
   {
-    if (!duplicate(i, fileIn))
+    if (!duplicate(i, fileIn)) // check if character has occurred previously
     {
-      sym.push_back(fileIn[i]);
-      cnt.push_back(frequency(fileIn[i], fileIn));
+      sym.push_back(fileIn[i]); // store character in symbol vector
+      cnt.push_back(frequency(fileIn[i], fileIn)); // store count of character in count vector
     }   
   }  
   return;
@@ -101,7 +101,7 @@ void newlineToEOL(std::string &fileIn)
   return;
 }
 
-// child process function to write compression to file
+// function to write compression to file
 void writeToFile(char sym, std::string fileIn, std::string fileName)
 {
   std::string convertEOL = fileIn;
@@ -136,20 +136,20 @@ void removeChar(char sym, std::string &str)
 // compresses symbols to binary
 void compression(std::string &fileIn, std::vector<char> &sym)
 {
-  pid_t pid;
+  pid_t pid; // initialize for child processes
   std::string fileName;
-  if (fileIn.empty())
+  if (fileIn.empty()) // exit function if string is empty
     return;
   for (int i = 0; i < sym.size(); i++)
   {
     fileName = "out" + std::to_string(i);
-    if ((pid = fork()) == 0)
+    if ((pid = fork()) == 0) // check if child process is successful
     {
-      writeToFile(sym[i], fileIn, fileName);      
-      exit(0);
+      writeToFile(sym[i], fileIn, fileName); // child process calls function   
+      exit(0); // exit child process
     }
-    wait(0);
-    removeChar(sym[i], fileIn);
+    wait(0); // wait for successful exit code from child process
+    removeChar(sym[i], fileIn); // remove character that was coded by child process
   }
 }
 
@@ -175,8 +175,8 @@ void printFiles(std::vector<char> &sym)
   {
     fileName = "out" + std::to_string(i);
     inFile.open(fileName);
-    std::getline(inFile, message);  // store first line in file as the message
-    std::getline(inFile, code);     // store second line in file as the code
+    std::getline(inFile, message); // store first line in file as the message
+    std::getline(inFile, code); // store second line in file as the code
     if (i == 0)
       std::cout << "Original Message:\t" << message << std::endl;
     else
